@@ -1,5 +1,5 @@
 import './App.css';
-import {Routes, Route, BrowserRouter} from "react-router-dom";
+import {Routes, Route, BrowserRouter, Navigate} from "react-router-dom";
 import LoginPage from './components/LoginPage/LoginPage';
 import SignUpPage from './components/SignUpPage/SignUpPage';
 import EduSphere from './components/EduSphere/EduShpere';
@@ -9,6 +9,7 @@ function App() {
     <>
       <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate replace to="/Login" />} />
         <Route path="/Login" exact element={<LoginPage/>}></Route>
         <Route path="/Signup" exact element={<SignUpPage />}></Route>
         <Route path="/EduSphere" exact element={<EduSphere />}></Route>

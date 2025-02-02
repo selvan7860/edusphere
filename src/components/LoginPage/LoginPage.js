@@ -47,7 +47,9 @@ export default function LoginPage() {
       console.log('Login successful:', response.data);
       // You can store the token in localStorage/sessionStorage or context as needed
       localStorage.setItem('authToken', response.data.token); // assuming the API returns a token
-      navigate('/dashboard'); // Navigate to the dashboard or home page
+      localStorage.setItem('role', response.data.data.role); 
+      console.log('role', response.data.data.role)
+      navigate('/EduSphere'); // Navigate to the dashboard or home page
 
     } catch (err) {
       console.error('Login failed:', err);

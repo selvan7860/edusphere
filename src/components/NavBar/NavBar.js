@@ -1,7 +1,22 @@
 import React from "react";
 import { Drawer, List, ListItem, ListItemText, Toolbar, Typography, Button, Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ onMenuClick, onLogout }) => {
+const Navbar = ({ onMenuClick }) => {
+  const navigate = useNavigate();
+  // Retrieve the role from localStorage
+  const userRole = localStorage.getItem("role");
+
+  // Logout function
+  const handleLogout = () => {
+    // Clear localStorage or any session data
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("role");
+
+    // Redirect to the login page
+    navigate("/login");
+  };
+
   return (
     <Drawer variant="permanent" sx={{ width: 240, flexShrink: 0, display: "flex", flexDirection: "column" }}>
       {/* Toolbar Title */}
@@ -14,12 +29,24 @@ const Navbar = ({ onMenuClick, onLogout }) => {
       {/* Menu List */}
       <Box sx={{ flexGrow: 1 }}>
         <List>
-          <ListItem button onClick={() => onMenuClick("register")}>
-            <ListItemText primary="College Registration" />
-          </ListItem>
-          <ListItem button onClick={() => onMenuClick("portal")}>
-            <ListItemText primary="College Portals" />
-          </ListItem>
+          {userRole === "STUDENT" && (
+            // Show only the College Portals for student
+            <ListItem button onClick={() => onMenuClick("portal")}>
+              <ListItemText primary="College Portals" />
+            </ListItem>
+          )}
+
+          {userRole === "UNIVERSITY" && (
+            <>
+              {/* Show both College Portals and College Registration for university */}
+              <ListItem button onClick={() => onMenuClick("register")}>
+                <ListItemText primary="College Registration" />
+              </ListItem>
+              <ListItem button onClick={() => onMenuClick("portal")}>
+                <ListItemText primary="College Portals" />
+              </ListItem>
+            </>
+          )}
         </List>
       </Box>
 
@@ -29,7 +56,7 @@ const Navbar = ({ onMenuClick, onLogout }) => {
           variant="contained"
           color="secondary"
           fullWidth
-          onClick={onLogout} // Callback for logout action
+          onClick={handleLogout} // Logout and navigate to login page
         >
           Logout
         </Button>
