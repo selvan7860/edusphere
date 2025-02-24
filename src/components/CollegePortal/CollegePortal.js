@@ -20,7 +20,7 @@ const CollegePortal = () => {
         const params = {
           q: searchTerm,  // Passing searchTerm as q
           filter: [
-            selectedLocation && { field: 'collegeLocation', value: selectedLocation },
+            selectedLocation && { field: 'collegeLocation.keyword', value: selectedLocation },
             selectedCourse && { field: 'courses.courseName', value: selectedCourse }
           ].filter(Boolean)  // Filtering out any empty values
         };
