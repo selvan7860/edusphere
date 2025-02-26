@@ -4,7 +4,7 @@ import axios from "axios";
 
 const CollegeRegistration = () => {
   const [courses, setCourses] = useState([]);
-  const [currentCourse, setCurrentCourse] = useState("");
+  const [currentCourse, setCurrentCourse] = useState({ courseName: "", seatAvailable: "" });
   const [formData, setFormData] = useState({
     collegeName: "",
     collegeCode: "",
@@ -24,15 +24,21 @@ const CollegeRegistration = () => {
     }));
   };
 
-  const handleCourseAdd = (e) => {
-    if ((e.key === "Enter" || e.key === "Tab") && currentCourse.trim() !== "") {
-      e.preventDefault();
-      if (!courses.some((course) => course.courseName === currentCourse.trim())) {
-        setCourses((prev) => [...prev, { courseName: currentCourse.trim() }]);
-        setCurrentCourse(""); // Clear the input
+  const handleCourseChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentCourse((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCourseAdd = () => {
+    if (currentCourse.courseName.trim() !== "" && currentCourse.seatAvailable.trim() !== "") {
+      if (!courses.some((course) => course.courseName === currentCourse.courseName.trim())) {
+        setCourses((prev) => [...prev, { ...currentCourse }]);
+        setCurrentCourse({ courseName: "", seatAvailable: "" });
       } else {
         setSnackbar({ open: true, message: "Duplicate course not allowed.", severity: "warning" });
       }
+    } else {
+      setSnackbar({ open: true, message: "Please enter both course name and seat availability.", severity: "error" });
     }
   };
 
@@ -56,14 +62,11 @@ const CollegeRegistration = () => {
 
     const payload = {
       ...formData,
-      courses, // Send the courses array as-is
+      courses,
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/colleges",
-        payload
-      );
+      const response = await axios.post("http://localhost:8080/api/v1/colleges", payload);
       if (response.data.success && response.data.message === "Success") {
         setSnackbar({ open: true, message: "College registered successfully!", severity: "success" });
       } else {
@@ -85,19 +88,11 @@ const CollegeRegistration = () => {
         College Registration
       </Typography>
       <Grid container spacing={2}>
-        {[
-          { label: "College Name", name: "collegeName" },
-          { label: "College Code", name: "collegeCode" },
-          { label: "Email", name: "collegeEmail" },
-          { label: "Phone Number", name: "collegePhone" },
-          { label: "Link", name: "collegeWebSiteLink" },
-          { label: "Location", name: "collegeLocation" },
-          { label: "Description", name: "collegeDescription" },
-        ].map(({ label, name }) => (
+        {["collegeName", "collegeCode", "collegeEmail", "collegePhone", "collegeWebSiteLink", "collegeLocation", "collegeDescription"].map((name) => (
           <Grid item xs={12} sm={6} key={name}>
             <TextField
               fullWidth
-              label={label}
+              label={name.replace(/([A-Z])/g, " $1").trim()}
               name={name}
               variant="outlined"
               value={formData[name]}
@@ -105,40 +100,38 @@ const CollegeRegistration = () => {
             />
           </Grid>
         ))}
-        {/* Course Field */}
+
         <Grid item xs={12} sm={6}>
           <Typography sx={{ marginBottom: 1 }}>Course</Typography>
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 1,
-              border: "1px solid #ccc",
-              borderRadius: 1,
-              padding: 1,
-              alignItems: "center",
-            }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, border: "1px solid #ccc", borderRadius: 1, padding: 1 }}>
             {courses.map((course, index) => (
-              <Chip
-                key={index}
-                label={course.courseName}
-                onDelete={() => handleCourseDelete(course)}
-                color="primary"
-              />
+              <Chip key={index} label={`${course.courseName} (${course.seatAvailable} seats)`} onDelete={() => handleCourseDelete(course)} color="primary" />
             ))}
-            <TextField
-              value={currentCourse}
-              onChange={(e) => setCurrentCourse(e.target.value)}
-              onKeyDown={handleCourseAdd}
-              placeholder="Type a course and press Enter/Tab"
-              variant="outlined"
-              size="small"
-              sx={{ flexGrow: 1, minWidth: 120 }}
-            />
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                label="Course Name"
+                name="courseName"
+                variant="outlined"
+                size="small"
+                value={currentCourse.courseName}
+                onChange={handleCourseChange}
+              />
+              <TextField
+                label="Seats Available"
+                name="seatAvailable"
+                variant="outlined"
+                size="small"
+                type="number"
+                value={currentCourse.seatAvailable}
+                onChange={handleCourseChange}
+              />
+              <Button variant="contained" color="primary" onClick={handleCourseAdd}>
+                Add
+              </Button>
+            </Box>
           </Box>
         </Grid>
-        {/* Submit Button */}
+
         <Grid item xs={12}>
           <Button variant="contained" color="primary" onClick={handleSubmit}>
             Submit
@@ -146,18 +139,8 @@ const CollegeRegistration = () => {
         </Grid>
       </Grid>
 
-      {/* Snackbar for success or error */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
