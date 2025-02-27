@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Grid, Typography, Select, MenuItem, InputLabel, FormControl, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { 
+  TextField, Button, Box, Grid, Typography, Select, MenuItem, 
+  InputLabel, FormControl, Dialog, DialogActions, DialogContent, DialogTitle 
+} from '@mui/material';
 import axios from 'axios';
-import CollegeCard from '../CollegeCard/CollegeCard';  // Update path if necessary
+import CollegeCard from '../CollegeCard/CollegeCard'; // Update the path if necessary
 
 const CollegePortal = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,16 +62,27 @@ const CollegePortal = () => {
         </Button>
       </Box>
 
+      {/* Filter Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="md">
         <DialogTitle>Filter Colleges</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', marginBottom: 3 }}>
+            
+            {/* Location Dropdown with Scrolling */}
             <FormControl fullWidth>
               <InputLabel>Location</InputLabel>
               <Select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
                 label="Location"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250, // Enables scrolling
+                      overflowY: "auto",
+                    },
+                  },
+                }}
               >
                 <MenuItem value=""><em>All</em></MenuItem>
                 {locations.map((location) => (
@@ -79,12 +93,21 @@ const CollegePortal = () => {
               </Select>
             </FormControl>
 
+            {/* Course Dropdown with Scrolling */}
             <FormControl fullWidth>
               <InputLabel>Course</InputLabel>
               <Select
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
                 label="Course"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250, // Enables scrolling
+                      overflowY: "auto",
+                    },
+                  },
+                }}
               >
                 <MenuItem value=""><em>All</em></MenuItem>
                 {courses.map((course) => (
@@ -94,6 +117,7 @@ const CollegePortal = () => {
                 ))}
               </Select>
             </FormControl>
+
           </Box>
         </DialogContent>
         <DialogActions>
@@ -102,6 +126,7 @@ const CollegePortal = () => {
         </DialogActions>
       </Dialog>
 
+      {/* College List */}
       <Grid container spacing={3}>
         {colleges.length > 0 ? (
           colleges.map((college) => (
